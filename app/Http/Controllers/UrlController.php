@@ -50,7 +50,7 @@ class UrlController extends Controller
      *                 type="string",
      *                 format="url",
      *                 description="The shortened URL (use this to redirect)",
-     *                 example="http://localhost:8000/s/abc123"
+     *                 example=L5_SWAGGER_SHORT_URL_EXAMPLE
      *             ),
      *             @OA\Property(
      *                 property="short_code",
@@ -229,7 +229,7 @@ class UrlController extends Controller
      *                 type="string",
      *                 format="url",
      *                 description="The complete shortened URL",
-     *                 example="http://localhost:8000/s/abc123"
+     *                 example=L5_SWAGGER_SHORT_URL_EXAMPLE
      *             ),
      *             @OA\Property(
      *                 property="created_at",
