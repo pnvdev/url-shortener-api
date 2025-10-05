@@ -1,0 +1,300 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "URL Shortener API",
+        "description": "API for URL shortening service",
+        "contact": {
+            "email": "support@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/short-urls": {
+            "post": {
+                "tags": [
+                    "URL Shortener"
+                ],
+                "summary": "Create a shortened URL",
+                "description": "Takes a long URL and returns a shortened version",
+                "operationId": "shortenUrl",
+                "requestBody": {
+                    "description": "URL to be shortened",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "url"
+                                ],
+                                "properties": {
+                                    "url": {
+                                        "description": "The original URL to be shortened",
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://www.example.com/very/long/url/path"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successfully created shortened URL",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "original_url": {
+                                            "description": "The original URL that was shortened",
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "https://www.example.com/very/long/url/path"
+                                        },
+                                        "short_url": {
+                                            "description": "The shortened URL (use this to redirect)",
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "http://localhost:8000/s/abc123"
+                                        },
+                                        "short_code": {
+                                            "description": "The short code (6 characters)",
+                                            "type": "string",
+                                            "example": "abc123"
+                                        },
+                                        "created_at": {
+                                            "description": "Creation timestamp",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-10-05T12:34:56.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - Invalid or missing URL",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The url field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Database or server issue",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/s/{shortCode}": {
+            "get": {
+                "tags": [
+                    "URL Shortener"
+                ],
+                "summary": "Redirect to original URL",
+                "description": "Redirects to the original URL using the short code. This is the actual URL shortener redirect endpoint.",
+                "operationId": "redirectToOriginalUrl",
+                "parameters": [
+                    {
+                        "name": "shortCode",
+                        "in": "path",
+                        "description": "The short code for the URL (6 alphanumeric characters)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[a-zA-Z0-9]{6}$",
+                            "example": "abc123"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Successfully redirecting to the original URL",
+                        "headers": {
+                            "Location": {
+                                "description": "The original URL to redirect to",
+                                "schema": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "https://www.example.com/very/long/url/path"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Short URL not found - Invalid or expired short code",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "URL not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Database or server issue",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/short-urls/{shortCode}": {
+            "get": {
+                "tags": [
+                    "URL Shortener"
+                ],
+                "summary": "Get URL details by short code",
+                "description": "Retrieves detailed information about a shortened URL without redirecting",
+                "operationId": "getUrlDetails",
+                "parameters": [
+                    {
+                        "name": "shortCode",
+                        "in": "path",
+                        "description": "The short code for the URL",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[a-zA-Z0-9]{6}$",
+                            "example": "abc123"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved URL details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "original_url": {
+                                            "description": "The original URL",
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "https://www.example.com/very/long/url/path"
+                                        },
+                                        "short_code": {
+                                            "description": "The short code",
+                                            "type": "string",
+                                            "example": "abc123"
+                                        },
+                                        "short_url": {
+                                            "description": "The complete shortened URL",
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "http://localhost:8000/s/abc123"
+                                        },
+                                        "created_at": {
+                                            "description": "When the short URL was created",
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-10-05T12:34:56.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Short URL not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "URL not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Database or server issue",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "URL Shortener",
+            "description": "API Endpoints for URL shortening service"
+        }
+    ]
+}
