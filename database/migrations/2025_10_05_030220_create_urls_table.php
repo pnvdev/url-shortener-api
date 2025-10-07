@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('urls', function (Blueprint $table) {
             $table->id();
-            $table->string('original_url');
-            $table->string('short_code')->unique();
+            $table->string('original_url', 2048); // Permitir URLs largas
+            $table->string('short_code', 6)->unique();
             $table->timestamps();
         });
     }
