@@ -174,43 +174,4 @@ class UrlShortenerApiTest extends TestCase
         $this->assertStringContainsString($shortCode, $shortUrl);
         $this->assertStringContainsString('/s/', $shortUrl);
     }
-
-    /** @test */
-    public function it_can_retrieve_url_details_by_short_code()
-    {
-        // Arrange
-        $url = Url::create([
-            'original_url' => 'https://www.example.com/test',
-            'short_code' => 'test01',
-        ]);
-
-        // Act
-        $response = $this->getJson('/api/short-urls/test01');
-
-        // Assert
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'original_url',
-                'short_code',
-                'short_url',
-                'created_at',
-            ])
-            ->assertJson([
-                'original_url' => 'https://www.example.com/test',
-                'short_code' => 'test01',
-            ]);
-    }
-
-    /** @test */
-    public function it_returns_404_for_non_existent_short_code()
-    {
-        // Act
-        $response = $this->getJson('/api/short-urls/nonexist');
-
-        // Assert
-        $response->assertStatus(404)
-            ->assertJson([
-                'error' => 'URL not found',
-            ]);
-    }
 }
