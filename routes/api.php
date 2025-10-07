@@ -15,4 +15,3 @@ use App\Http\Controllers\UrlController;
 */
 
 Route::post('/short-urls', [UrlController::class, 'store']);
-Route::get('/short-urls/{shortCode}', [UrlController::class, 'show']);
